@@ -34,7 +34,11 @@ Try to get original sprites if possible, for the best quality - pixel art can ge
 
 ### Adding it to the game
 
-To be able to add any character sets to the game, fork this project, and set it up to be served publicly via GitHub Pages, setting the "Source" option to GitHub Actions (this will then use the existing "static.yml" workflow which does some required setup and serves the proper folder). If you aren't familiar with using GitHub Pages, a good tutorial on using it is provided by The Odin Project here: https://www.theodinproject.com/lessons/foundations-recipes#viewing-your-project-on-the-web. Or if all of this working with a repo is something you aren't familiar with, other tutorials on this site can help you with that too.
+To be able to add any character sets to the game, fork this project, and set it up to be served publicly via GitHub Pages, setting the "Source" option to GitHub Actions (this will then use the existing "static.yml" workflow which does some required setup and serves the proper folder).
+
+![image](img/pages-source-setting.png)
+
+If you aren't familiar with using GitHub Pages, a good tutorial on using it is provided by The Odin Project here: https://www.theodinproject.com/lessons/foundations-recipes#viewing-your-project-on-the-web. Or if all of this working with a repo is something you aren't familiar with, other tutorials on this site can help you with that too.
 
 Then, edit the repo by adding in a folder with your character set in the "public/character-sets" folder. The name of the folder will be used exactly as it for the name of the character set. If you want (but you probably don't need to worry about this), you can add an index before the name of the character set in the folder to affect how it's sorted when the options are given to the player, e.g. folders named `1-Undertale` and `2-Deltarune` will put the Undertale character set first, whereas without the indices it would sort alphabetically with Deltarune first.
 
