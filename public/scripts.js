@@ -2192,13 +2192,13 @@ function navigateSettings(e) {
     return;
   }
 
-  // move to the next or previous item, and loop around if necessary
+  // move to the next or previous item, stopping at the ends
   currentIndex += dir;
   if (currentIndex < 0) {
-    currentIndex = L_SETTINGS_OPTIONS.length - 1;
+    currentIndex = 0;
   }
   else if (currentIndex >= L_SETTINGS_OPTIONS.length) {
-    currentIndex = 0;
+    currentIndex = L_SETTINGS_OPTIONS.length - 1;
   }
   L_SETTINGS_OPTIONS[currentIndex].focus({ focusVisible: true });
 
