@@ -15,6 +15,7 @@
 # Bugfixes
 
 - Fixed a bug on the Settings page where keyboard navigation couldn't get to the Remember Settings box
+- Fixed bugs with keyboard navigation not working in the game and credits scenes
 
 ### Optimisation Changes
 
