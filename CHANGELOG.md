@@ -11,6 +11,7 @@
 ### Styling/UX Changes
 
 - Added links on main menu to report bugs or request features, and to the game's page on GameJolt
+- Changed text on Back button on settings page to "Save"
 
 # Bugfixes
 
