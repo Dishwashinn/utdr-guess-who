@@ -365,6 +365,14 @@ function cycleSelect(selectEl) {
 }
 
 /**
+ * Toggles an input element between on and off
+ * @param {Element} inputEl 
+ */
+function toggleInput(inputEl) {
+  inputEl.checked = !inputEl.checked;
+}
+
+/**
  * Simple implementation of an ease-out interpolation to a target value
  * @param {Number} cur 
  * @param {Number} target 
@@ -438,21 +446,20 @@ function exitNameScene() {
 
 function saveSettings() {
   // If any values aren't loaded in sessionStorage, set them now based on inputs
+
+  const cookieInfo = {};
+
   if (!sessionStorage.getItem("name"))
     sessionStorage["name"] = NAME_INPUT.value;
-  if (!sessionStorage.getItem("numGuesses"))
-    sessionStorage["numGuesses"] = SETTINGS_GUESS_SELECT.value;
-  if (!sessionStorage.getItem("cardScale"))
-    sessionStorage["cardScale"] = SETTINGS_SCALE_SELECT.value;
-  if (!sessionStorage.getItem("bgStyle"))
-    sessionStorage["bgStyle"] = SETTINGS_BG_STYLE_SELECT.value;
+  cookieInfo["name"] = sessionStorage["name"];
 
-  setCookie({
-    name: sessionStorage["name"],
-    numGuesses: sessionStorage["numGuesses"],
-    cardScale: sessionStorage["cardScale"],
-    bgStyle: sessionStorage["bgStyle"]
-  });
+  for (let i = 0; i < L_SETTING_NAMES.length; ++i) {
+    if (!sessionStorage.getItem(L_SETTING_NAMES[i]))
+      sessionStorage[L_SETTING_NAMES[i]] = L_SETTING_SOURCES[i].value;
+    cookieInfo[L_SETTING_NAMES[i]] = sessionStorage[L_SETTING_NAMES[i]];
+  }
+
+  setCookie(cookieInfo);
 }
 
 function setName(name) {
@@ -997,6 +1004,7 @@ const DEFAULT_LOOKUP_URL = "https://www.google.com/search?q=Undertale%20Deltarun
 const DEFAULT_NUM_GUESSES = document.querySelectorAll(".guess-icon").length;
 const DEFAULT_CARD_SCALE = +BODY_STYLE.getPropertyValue('--card-scale');
 const DEFAULT_BG_STYLE = document.getElementById("bg-style-select").value;
+const DEFAULT_BG_FLAVOR = document.getElementById("bg-flavor-select").value;
 const DEFAULT_CARD_WIDTH = parseInt(BODY_STYLE.getPropertyValue('--card-base-img-width')) * DEFAULT_CARD_SCALE;
 const DEFAULT_CARD_HEIGHT = parseInt(BODY_STYLE.getPropertyValue('--card-base-img-height')) * DEFAULT_CARD_SCALE;
 const DEFAULT_CARD_CSS_CLASS = "";
@@ -2018,18 +2026,29 @@ const SETTINGS_GUESS_SELECT = document.getElementById("num-guesses-select");
 const SETTINGS_SCALE_LABEL = document.getElementById("card-scale-label");
 const SETTINGS_SCALE_SELECT = document.getElementById("card-scale-select");
 const SETTINGS_SCALE_IMG = document.getElementById("example-character-img");
+const SETTINGS_BG_FLAVOR_LABEL = document.getElementById("bg-flavor-label");
+const SETTINGS_BG_FLAVOR_SELECT = document.getElementById("bg-flavor-select");
 const SETTINGS_BG_STYLE_LABEL = document.getElementById("bg-style-label");
 const SETTINGS_BG_STYLE_SELECT = document.getElementById("bg-style-select");
+const SETTINGS_REMEMBER_LABEL = document.getElementById("remember-settings-label");
 const SETTINGS_REMEMBER_BOX = document.getElementById("remember-settings");
 
 const SETTINGS_RESTORE_DEFAULT_BUTTON = document.getElementById("settings-restore-default");
 const SETTINGS_RESTORE_INIT_BUTTON = document.getElementById("settings-restore-init");
 const SETTINGS_BACK_BUTTON = document.getElementById("settings-back");
 
-const L_SETTINGS_OPTIONS = [SETTINGS_NAME_LINK, SETTINGS_GUESS_LABEL, SETTINGS_SCALE_LABEL, SETTINGS_BG_STYLE_LABEL,
-  SETTINGS_REMEMBER_BOX, SETTINGS_RESTORE_DEFAULT_BUTTON, SETTINGS_RESTORE_INIT_BUTTON, SETTINGS_BACK_BUTTON];
+const L_SETTINGS_OPTIONS = [SETTINGS_NAME_LINK, SETTINGS_GUESS_LABEL, SETTINGS_SCALE_LABEL, SETTINGS_BG_FLAVOR_LABEL,
+  SETTINGS_BG_STYLE_LABEL, SETTINGS_REMEMBER_LABEL, SETTINGS_RESTORE_DEFAULT_BUTTON, SETTINGS_RESTORE_INIT_BUTTON,
+  SETTINGS_BACK_BUTTON];
 
 const SETTINGS_EXAMPLE_CARD = document.getElementById("example-character-card");
+
+// Other constants
+const L_SETTING_NAMES = ["numGuesses", "cardScale", "bgFlavor", "bgStyle"];
+const L_SETTING_SOURCES = [SETTINGS_GUESS_SELECT, SETTINGS_SCALE_SELECT, SETTINGS_BG_FLAVOR_SELECT,
+  SETTINGS_BG_STYLE_SELECT];
+const L_SETTINGS_DEFAULTS = [DEFAULT_NUM_GUESSES, DEFAULT_CARD_SCALE, DEFAULT_BG_FLAVOR, DEFAULT_BG_STYLE];
+const L_SETTINGS_ON_UPDATE = [() => 0, () => 0, () => 0, () => 0,];
 
 
 // Functions
@@ -2045,9 +2064,9 @@ function exitSettingsScene() {
   window.removeEventListener("keydown", navigateSettings);
 
   // Save settings on exiting the scene
-  sessionStorage["numGuesses"] = SETTINGS_GUESS_SELECT.value;
-  sessionStorage["cardScale"] = SETTINGS_SCALE_SELECT.value;
-  sessionStorage["bgStyle"] = SETTINGS_BG_STYLE_SELECT.value;
+  for (let i = 0; i < L_SETTING_NAMES.length; ++i) {
+    sessionStorage[L_SETTING_NAMES[i]] = L_SETTING_SOURCES[i].value;
+  }
 
   // If the user desires, store the value in a cookie to remember it
   if (SETTINGS_REMEMBER_BOX.checked) {
@@ -2070,6 +2089,7 @@ function updateCardScale() {
   const inspectImgScale = window.getComputedStyle(YOUR_CHAR_IMG).getPropertyValue('--your-char-scale');
   document.querySelectorAll(".inspect-img").forEach((el) => scaleImage(el, inspectImgScale));
 }
+L_SETTINGS_ON_UPDATE[L_SETTING_NAMES.indexOf("cardScale")] = updateCardScale;
 
 /**
  * Update the CSS background style property
@@ -2077,6 +2097,15 @@ function updateCardScale() {
 function updateBgStyle() {
   document.documentElement.setAttribute("bg-style", SETTINGS_BG_STYLE_SELECT.value);
 }
+L_SETTINGS_ON_UPDATE[L_SETTING_NAMES.indexOf("bgStyle")] = updateBgStyle;
+
+/**
+ * Update the CSS background flavor property
+ */
+function updateBgFlavor() {
+  document.documentElement.setAttribute("bg-flavor", SETTINGS_BG_FLAVOR_SELECT.value);
+}
+L_SETTINGS_ON_UPDATE[L_SETTING_NAMES.indexOf("bgFlavor")] = updateBgFlavor;
 
 /**
  * Sync the Remember Name and Remember Settings checkboxes
@@ -2086,16 +2115,19 @@ function updateRememberSettings() {
 }
 
 function restoreDefaultSettings() {
-  setSelectByValue(SETTINGS_GUESS_SELECT, DEFAULT_NUM_GUESSES);
-  setSelectByValue(SETTINGS_SCALE_SELECT, DEFAULT_CARD_SCALE);
-  setSelectByValue(SETTINGS_BG_STYLE_SELECT, DEFAULT_BG_STYLE);
-  updateCardScale();
+  for (let i = 0; i < L_SETTING_NAMES.length; ++i) {
+    setSelectByValue(L_SETTING_SOURCES[i], L_SETTINGS_DEFAULTS[i]);
+    L_SETTINGS_ON_UPDATE[i]();
+  }
 }
 
 function restoreInitSettings() {
-  setSelectByValue(SETTINGS_GUESS_SELECT, initSettings["numGuesses"]);
-  setSelectByValue(SETTINGS_SCALE_SELECT, initSettings["cardScale"]);
-  updateCardScale();
+  for (let i = 0; i < L_SETTING_NAMES.length; ++i) {
+    if (Object.keys(initSettings).includes(L_SETTING_NAMES[i])) {
+      setSelectByValue(L_SETTING_SOURCES[i], initSettings[L_SETTING_NAMES[i]]);
+      L_SETTINGS_ON_UPDATE[i]();
+    }
+  }
 }
 
 /**
@@ -2136,6 +2168,15 @@ function navigateSettings(e) {
       } else if (el == SETTINGS_SCALE_LABEL) {
         cycleSelect(SETTINGS_SCALE_SELECT);
         updateCardScale();
+      } else if (el == SETTINGS_BG_FLAVOR_LABEL) {
+        cycleSelect(SETTINGS_BG_FLAVOR_SELECT);
+        updateBgFlavor();
+      } else if (el == SETTINGS_BG_STYLE_LABEL) {
+        cycleSelect(SETTINGS_BG_STYLE_SELECT);
+        updateBgStyle();
+      } else if (el == SETTINGS_REMEMBER_LABEL) {
+        toggleInput(SETTINGS_REMEMBER_BOX);
+        updateRememberSettings();
       } else {
         el.click();
       }
@@ -2167,8 +2208,11 @@ function navigateSettings(e) {
 // -----
 
 SETTINGS_NAME_LINK.addEventListener("click", () => switchScene(NAME_SCENE));
-SETTINGS_SCALE_SELECT.addEventListener("change", updateCardScale);
-SETTINGS_BG_STYLE_SELECT.addEventListener("change", updateBgStyle);
+
+for (let i = 0; i < L_SETTING_NAMES.length; ++i) {
+  L_SETTING_SOURCES[i].addEventListener("change", L_SETTINGS_ON_UPDATE[i]);
+}
+
 SETTINGS_REMEMBER_BOX.addEventListener("change", updateRememberSettings);
 
 SETTINGS_RESTORE_DEFAULT_BUTTON.addEventListener("click", restoreDefaultSettings);
@@ -2219,13 +2263,13 @@ window.onload = function () {
     () => { NAME_REMEMBER_BOX.checked = false; SETTINGS_REMEMBER_BOX.checked = false });
 
   // Get and apply other saved settings
-  loadSetting("numGuesses", () => setSelectByValue(SETTINGS_GUESS_SELECT, initSettings.numGuesses));
+  for (let i = 0; i < L_SETTING_NAMES.length; ++i) {
+    loadSetting(L_SETTING_NAMES[i], () => setSelectByValue(L_SETTING_SOURCES[i], initSettings[L_SETTING_NAMES[i]]));
+  }
 
-  loadSetting("cardScale", () => setSelectByValue(SETTINGS_SCALE_SELECT, initSettings.cardScale));
   updateCardScale();
-
-  loadSetting("bgStyle", () => setSelectByValue(SETTINGS_BG_STYLE_SELECT, initSettings.bgStyle));
   updateBgStyle();
+  updateBgFlavor();
 
   fixMenuTabIndex();
   loadCharacterSetList().then(() => {
