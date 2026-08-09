@@ -13,7 +13,7 @@
 - Added links on main menu to report bugs or request features, and to the game's page on GameJolt
 - Changed text on Back button on settings page to "Save"
 
-# Bugfixes
+### Bugfixes
 
 - Fixed a bug on the Settings page where keyboard navigation couldn't get to the Remember Settings box
 - Fixed bugs with keyboard navigation not working in the game and credits scenes
